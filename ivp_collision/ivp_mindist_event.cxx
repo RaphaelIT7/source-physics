@@ -33,7 +33,7 @@ public:
     IVP_U_Point point_of_area_object;
     // object B    
     
-    IVP_DOUBLE get_value(IVP_U_Matrix *A_w_f_c,IVP_U_Matrix *B_w_f_c);
+    IVP_DOUBLE get_value(IVP_U_Matrix *A_w_f_c,IVP_U_Matrix *B_w_f_c) override;
 };
 
 IVP_DOUBLE IVP_3D_Solver_PF_COLL::get_value(IVP_U_Matrix *A_w_f_c,IVP_U_Matrix *B_w_f_c){
@@ -58,7 +58,7 @@ public:
 
     // object B
     IVP_U_Point hesse_of_area_object;
-    IVP_DOUBLE get_value(IVP_U_Matrix *A_w_f_c,IVP_U_Matrix *B_w_f_c);
+    IVP_DOUBLE get_value(IVP_U_Matrix *A_w_f_c,IVP_U_Matrix *B_w_f_c) override;
 };
 
 IVP_DOUBLE IVP_3D_Solver_VEC_PARALLEL_AREA::get_value(IVP_U_Matrix *A_w_f_c,IVP_U_Matrix *B_w_f_c){
@@ -81,7 +81,7 @@ public:
     IVP_U_Point B_object;
     IVP_U_Point normized_direction_world_at_t0;
 
-    IVP_DOUBLE get_value(IVP_U_Matrix *A_w_f_c,IVP_U_Matrix *B_w_f_c);
+    IVP_DOUBLE get_value(IVP_U_Matrix *A_w_f_c,IVP_U_Matrix *B_w_f_c) override;
 };
 
 IVP_DOUBLE IVP_3D_Solver_DISTANCE_OF_TWO_POINTS::get_value(IVP_U_Matrix *A_w_f_c,IVP_U_Matrix *B_w_f_c){
@@ -113,7 +113,7 @@ public:
     // object B is edge
     IVP_U_Point K_object;
     IVP_U_Point K_vec_object;	// normized K_vec
-    IVP_DOUBLE get_value(IVP_U_Matrix *A_w_f_c,IVP_U_Matrix *B_w_f_c);
+    IVP_DOUBLE get_value(IVP_U_Matrix *A_w_f_c,IVP_U_Matrix *B_w_f_c) override;
 };
 
 IVP_DOUBLE IVP_3D_Solver_S_VALS::get_value(IVP_U_Matrix *A_w_f_c,IVP_U_Matrix *B_w_f_c){
@@ -140,7 +140,7 @@ public:
     // object B is edge
     IVP_U_Point K_object;
     IVP_U_Point K_vec_object;	// normized K_vec
-    IVP_DOUBLE get_value(IVP_U_Matrix *A_w_f_c,IVP_U_Matrix *B_w_f_c);
+    IVP_DOUBLE get_value(IVP_U_Matrix *A_w_f_c,IVP_U_Matrix *B_w_f_c) override;
 };
 
 
@@ -185,10 +185,10 @@ public:
     IVP_U_Float_Point K_object;
     IVP_U_Point K_vec_object;	// normized K_vec
     IVP_U_Point K_Lot_object;	// a normized vertical direction
-    IVP_DOUBLE get_value(IVP_U_Matrix *A_w_f_c,IVP_U_Matrix *B_w_f_c);
+    IVP_DOUBLE get_value(IVP_U_Matrix *A_w_f_c,IVP_U_Matrix *B_w_f_c) override;
 };
 
-IVP_DOUBLE IVP_3D_Solver_PK_COLL::get_value(IVP_U_Matrix *A_w_f_c,IVP_U_Matrix *B_w_f_c){
+IVP_DOUBLE IVP_3D_Solver_PK_COLL::get_value(IVP_U_Matrix *A_w_f_c,IVP_U_Matrix *B_w_f_c) {
     IVP_3D_Solver_PK_COLL *t = this;
     
     IVP_U_Point P_world;
@@ -218,7 +218,7 @@ public:
 
     // object B
     IVP_U_Point hesse_of_area_object;
-    IVP_DOUBLE get_value(IVP_U_Matrix *A_w_f_c, IVP_U_Matrix *B_w_f_c);
+    IVP_DOUBLE get_value(IVP_U_Matrix *A_w_f_c, IVP_U_Matrix *B_w_f_c) override;
 
 };
 
@@ -369,7 +369,7 @@ public:
     IVP_DOUBLE side;		// direction of H
 
     // object B
-    IVP_DOUBLE get_value(IVP_U_Matrix *K_w_f_c,IVP_U_Matrix *L_w_f_c);
+    IVP_DOUBLE get_value(IVP_U_Matrix *K_w_f_c,IVP_U_Matrix *L_w_f_c) override;
 };
 
 IVP_DOUBLE IVP_3D_Solver_KK_COLL::get_value(IVP_U_Matrix *K_w_f_c,IVP_U_Matrix *L_w_f_c){
@@ -401,7 +401,7 @@ public:
     IVP_U_Point l_vec_object;		// normized l direction
 
     // object B
-    IVP_DOUBLE get_value(IVP_U_Matrix *K_w_f_c,IVP_U_Matrix *L_w_f_c);
+    IVP_DOUBLE get_value(IVP_U_Matrix *K_w_f_c,IVP_U_Matrix *L_w_f_c) override;
 };
 
 IVP_DOUBLE IVP_3D_Solver_KK_PARALLEL::get_value(IVP_U_Matrix *K_w_f_c,IVP_U_Matrix *L_w_f_c){
@@ -495,7 +495,7 @@ void IVP_Mindist_Event_Solver::calc_next_event_KK(const IVP_Compact_Edge *K,
 	    solver_kk_coll.find_first_t_for_value_coll(   mindist->get_coll_dist() ,ivp_mindist_settings.real_coll_dist, 
 							   t_now, event_time_out,  
 							   &cache_K, &cache_L, 0, &event_time_out );
-	if (found){
+	if ( !hk_Math::almost_zero( found ) ){
 	    event_type_out = IVP_COLL_KK_COLL;
 	}
     }
@@ -514,7 +514,7 @@ void IVP_Mindist_Event_Solver::calc_next_event_KK(const IVP_Compact_Edge *K,
 	    solver_kk_parallel.find_first_t_for_value_max_dev( P_DOUBLE_EPS, 
 							       t_now, event_time_out, 0, 
 							       &cache_K, &cache_L , 0, &event_time_out );
-	if (found){
+	if ( !hk_Math::almost_zero( found ) ){
 	    event_type_out = IVP_COLL_KK_PARALLEL;
 	}
     }
@@ -606,10 +606,10 @@ void IVP_Mindist_Event_Solver::calc_next_event_PP(const IVP_Compact_Edge *P,
     IVP_U_Matrix_Cache cache_P2(m_cache_P2->clp_cache_object);
     
 
-    IVP_DOUBLE sum_abs_omega;
+    //IVP_DOUBLE sum_abs_omega;
     IVP_Core *solver_P = m_cache_P->get_core();
     IVP_Core *solver_P2 = m_cache_P2->get_core();
-    sum_abs_omega = solver_P->abs_omega + solver_P2->abs_omega;
+    //sum_abs_omega = solver_P->abs_omega + solver_P2->abs_omega;
 
     event_time_out =  t_max;
     const IVP_U_Float_Point *points_object[2];
@@ -726,10 +726,10 @@ void IVP_Mindist_Event_Solver::calc_next_event_BP(IVP_Ball * ball,const  IVP_Com
     IVP_U_Matrix_Cache cache_P(m_cache_B);
     IVP_U_Matrix_Cache cache_P2(m_cache_P2->clp_cache_object);
     
-    IVP_DOUBLE sum_abs_omega;
+    //IVP_DOUBLE sum_abs_omega;
     IVP_Core *solver_P = ball->get_core();
     IVP_Core *solver_P2 = m_cache_P2->get_core();
-    sum_abs_omega = solver_P->abs_omega + solver_P2->abs_omega;
+    //sum_abs_omega = solver_P->abs_omega + solver_P2->abs_omega;
 
     event_time_out =  t_max;
 
@@ -1036,10 +1036,8 @@ void IVP_Mindist_Event_Solver::calc_next_event_BK(IVP_Ball * ball,const  IVP_Com
     IVP_U_Matrix_Cache cache_P(m_cache_B);
     IVP_U_Matrix_Cache cache_K(m_cache_K->clp_cache_object);
     
-    IVP_DOUBLE sum_abs_omega;
-    IVP_Core *solver_P = ball->get_core();
-    IVP_Core *solver_K = m_cache_K->get_core();
-    sum_abs_omega = solver_P->abs_omega + solver_K->abs_omega;
+    //IVP_DOUBLE sum_abs_omega;
+    //sum_abs_omega = solver_P->abs_omega + solver_K->abs_omega;
 
     event_time_out =  t_max;
 

@@ -28,12 +28,12 @@ public:
 	if (n_elems>=memsize){
 	    this->increment_mem();
 	}
-    };
+    }
 protected:
     //  special vector with preallocated elems
     IVP_U_Vector(void **ielems, int size){
 	IVP_ASSERT (ielems == (void **)(this +1));
-	IVP_ASSERT (size >= 0 && size <= 0xFFFFU);
+	IVP_ASSERT (size >= 0 && size <= 0xFFFF);
 	elems = ielems;
 	memsize = (unsigned short)size;
 	n_elems = 0;
@@ -41,7 +41,7 @@ protected:
     
 public:
     IVP_U_Vector(int size = 0){
-	IVP_ASSERT (size >= 0 && size <= 0xFFFFU);
+	IVP_ASSERT (size >= 0 && size <= 0xFFFF);
 	memsize = (unsigned short)size;
 	n_elems = 0;
 	if (size){		// will be optimized by most compilers
@@ -49,7 +49,7 @@ public:
 	}else{	
 	    elems = (void **)NULL;
 	}
-    };
+    }
     
     void clear(){
 	if ( elems != (void **) (this+1)){
@@ -59,20 +59,20 @@ public:
 	    memsize = 0;
 	}
 	n_elems = 0;
-    };
+    }
 
     
     void remove_all(){
 	n_elems = 0;
-    };
+    }
     
     ~IVP_U_Vector(){
 	this->clear();
-    };
+    }
     
     int len() const {
 	return n_elems;
-    };
+    }
     
     int index_of(T *elem){
 	int i;
@@ -80,14 +80,14 @@ public:
 	    if (elems[i] == elem) break;
 	}
 	return i;
-    };
+    }
     
     int add(T *elem){
 	ensure_capacity();
 	//IVP_ASSERT( index_of(elem) == -1);
 	elems[n_elems] = (void *)elem;
 	return n_elems++;
-    };
+    }
 
     int install(T *elem){
 	int old_index = index_of(elem);
@@ -95,7 +95,7 @@ public:
 	ensure_capacity();
 	elems[n_elems] = (void *)elem;
 	return n_elems++;
-    };
+    }
 
     void swap_elems(int index1, int index2){
 	IVP_ASSERT((index1>=0)&&(index1<n_elems));
@@ -117,7 +117,7 @@ public:
 	}
 	elems[index] = (void *)elem;
 	n_elems++;
-    };
+    }
 
     
     void remove_at(int index){
@@ -128,7 +128,7 @@ public:
 	    j++;
 	}
 	n_elems--;
-    };
+    }
 
     void reverse() {
 	for (int i=0; i<(this->n_elems/2); i++) {
@@ -141,14 +141,14 @@ public:
 	IVP_ASSERT((index>=0)&&(index<n_elems));
 	n_elems--;
 	elems[ index ] = elems[ n_elems ];
-    };
+    }
 
     void remove_allow_resort(T *elem){
 	int index = this->index_of(elem);
 	IVP_ASSERT(index>=0);
 	n_elems--;
 	elems[ index ] = elems[ n_elems ];
-    };
+    }
     
     void remove(T *elem){
 	int index = this->index_of(elem);
@@ -158,12 +158,12 @@ public:
 	    elems[index] = (elems+1)[index];
 	    index++;
 	}
-    };
+    }
 
     T* element_at(int index) const {
 	IVP_ASSERT(index>=0 && index < n_elems);
 	return (T *)elems[index];
-    };
+    }
 };
 
 
@@ -188,7 +188,7 @@ public:
 class IVP_Vector_of_Cores_2: public IVP_U_Vector<class IVP_Core> {
     IVP_Core *elem_buffer[2];
 public:
-    IVP_Vector_of_Cores_2(): IVP_U_Vector<IVP_Core>( (void **)&elem_buffer[0],2 ){;};
+    IVP_Vector_of_Cores_2(): IVP_U_Vector<IVP_Core>( (void **)&elem_buffer[0],2 ){}
 };
 
 #endif

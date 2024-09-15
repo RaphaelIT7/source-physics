@@ -94,9 +94,9 @@ protected:
 
     friend class IVP_Environment;
     
-    virtual void do_simulation_controller(IVP_Event_Sim *,IVP_U_Vector<IVP_Core> *);
+    void do_simulation_controller(IVP_Event_Sim *,IVP_U_Vector<IVP_Core> *) override;
 
-    virtual IVP_CONTROLLER_PRIORITY get_controller_priority();
+    IVP_CONTROLLER_PRIORITY get_controller_priority() override;
  public:
     void set_constant(IVP_DOUBLE value); // will be multiplied with factor
     IVP_FLOAT get_constant(){ return spring_constant;};
@@ -124,7 +124,7 @@ protected:
     IVP_U_Active_Float *active_float_spring_constant;      // dito
     IVP_U_Active_Float *active_float_spring_damp;          // dito
     
-    void active_float_changed(IVP_U_Active_Float *af);
+    void active_float_changed(IVP_U_Active_Float *af) override;
 
     friend class IVP_Environment;
  public:    

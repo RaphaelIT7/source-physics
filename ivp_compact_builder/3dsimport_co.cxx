@@ -39,21 +39,21 @@ IVP_Template_SurfaceBuilder_3ds::IVP_Template_SurfaceBuilder_3ds(){
 
 
 // Default object name to set as public label
-#define DEFNAME "rawobj"
+//#define DEFNAME "rawobj"
 
 int flags = 0;
 
 #define  VERBOSE    0x0001    /* Verbose mode on                  */
 #define  OVERWR     0x0002    /* Don't sak for file overwrite     */
 #define  BINARY     0x0004    /* Binary output                    */
-#define  ASSEMBLY   0x0008    /* Assembly source output           */
-#define  CENTRE     0x0010    /* Centre objects                   */
-#define  SCALE      0x0020    /* Scale objects                    */
-#define  NOMAPFIX   0x0040    /* Don't fix bad mapping values     */
-#define  NORMNULL   0x0080    /* Don't remove null faces          */
-#define  NORMUNUSED 0x0100    /* Don't remove unused vertices     */
+//#define  ASSEMBLY   0x0008    /* Assembly source output           */
+//#define  CENTRE     0x0010    /* Centre objects                   */
+//#define  SCALE      0x0020    /* Scale objects                    */
+//#define  NOMAPFIX   0x0040    /* Don't fix bad mapping values     */
+//#define  NORMNULL   0x0080    /* Don't remove null faces          */
+//#define  NORMUNUSED 0x0100    /* Don't remove unused vertices     */
 #define  NORMDUP    0x0200    /* Don't remove duplicated vertices */
-#define  NOMAPPING  0x0400    /* Don't output mapping values      */
+//#define  NOMAPPING  0x0400    /* Don't output mapping values      */
 
 
 void FixMaps(H3dsScene * scene)
@@ -73,7 +73,7 @@ void FixMaps(H3dsScene * scene)
 				if(flags & VERBOSE)
 					ivp_message("%-14s bad mapping %.3f, scaling...\n",
 							mo->name, max);
-				float32 scale=1.0/max;
+				float32 scale=1.0f/max;
 				for(int mm=0; mm<mo->maps; mm++) {
 					H3dsMap * mmap = &mo->maplist[mm];
 					mmap->u *= scale;
@@ -821,17 +821,15 @@ IVP_Concave_Polyhedron * IVP_SurfaceBuilder_3ds::convert_3ds_to_concave(const ch
 class P_Hardware;
 int p_graphlib_robust_convert_3dmax_object_to_compact_ledges(P_Hardware *hw, const char *filename, IVP_U_BigVector<IVP_Compact_Ledge> *ledges) {
 
-#ifdef WIN32    
+#ifdef WIN32
+	flags |= NORMDUP;
 
-//    P_Hardware_W95 *w95_hw = (P_Hardware_W95 *)hw;
-flags |= NORMDUP;
-    char * infn=0, * name=DEFNAME;
+    const char * infn=0;
 	FILE * inf, * outf;
 	int n;
 	H3dsScene * scene;
-//    float32 xscale, yscale, zscale;
 
-	infn = (char *)filename;
+	infn = filename;
 	outf = NULL;
 
 	if(!infn) {
@@ -917,31 +915,6 @@ flags |= NORMDUP;
 		verts=n;
 	}
 
-#if 0
-    int x;
-    for (x=0; x<(int)verts; x++) {
-	H3dsMapVert *vm = &vrtmap[x];
-	IVP_U_Point *point = new IVP_U_Point();
-	point->k[0] = vm->x;
-	point->k[1] = vm->y;
-	point->k[2] = vm->z;
-	concave_polyhedron->points.add(point);
-    }
-
-    H3dsMeshObj * mo = &scene->meshobjlist[0];
-    for (x=0; x<(int)mo->faces; ) {
-        H3dsFace * fa = &mo->facelist[x++];
-	IVP_Concave_Polyhedron_Face *face = new IVP_Concave_Polyhedron_Face();
-	face->add_offset(fa->p0);
-	face->add_offset(fa->p1);
-	face->add_offset(fa->p2);
-	concave_polyhedron->faces.add(face);
-    }
-
-//    repair_geometry(concave_polyhedron);
-#endif
-
-    //IVP_U_BigVector<IVP_Compact_Ledge> ledges;
     IVP_U_Vector<IVP_U_Point> polygon;
 
     int i;

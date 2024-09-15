@@ -86,7 +86,7 @@ void IVV_Cluster_Min_Hash::min_removed_at_index(IVV_Cluster_Min_Hash_Elem *elem,
 	    for (el =el->next;el;el=el->next){
 #if defined( SORT_MINDIST_ELEMENTS )
 		if (el->value < new_min->value ||
-		    (el->value == new_min->value && el->cmp_index < new_min->cmp_index)){
+		    (hk_Math::almost_equal(el->value, new_min->value) && el->cmp_index < new_min->cmp_index)){
 		    new_min = el;
 		}
 #else
@@ -116,7 +116,7 @@ void IVV_Cluster_Min_Hash::min_removed_at_index(IVV_Cluster_Min_Hash_Elem *elem,
 	}else{
 #if defined( SORT_MINDIST_ELEMENTS )
 	if (stadel[j]->value < stadel[j+1]->value ||
-	    (stadel[j]->value == stadel[j+1]->value && stadel[j]->cmp_index < stadel[j+1]->cmp_index))
+	    (hk_Math::almost_equal(stadel[j]->value, stadel[j+1]->value) && stadel[j]->cmp_index < stadel[j+1]->cmp_index))
 #else
 	if (stadel[j]->value < stadel[j+1]->value)
 #endif	    
@@ -152,27 +152,6 @@ void IVV_Cluster_Min_Hash::change_value(void *elem, IVP_DOUBLE val){
 
     remove(elem);
     add(elem,val);
-    return;
-    int i = hash_index((char *)&elem);
-    IVV_Cluster_Min_Hash_Elem *el;
-    for (el = elems[i];el;el=el->next){
-	if ( el->elem == elem){
-	    break;
-	}
-    }
-    IVP_ASSERT(el != NULL);
-
-    if (val < el->value){	// we got smaller
-	el->value = val;	// update stadel
-	if (val <= min_per_array_pos[i]->value){	// new mimimum found
-	    min_added_at_index(el,i);
-	}
-    }else{	// we became bigger
-	el->value = val;	// update stadel
-	if (el == min_per_array_pos[i]){	// we were a minimum, so get rid of it
-	    min_removed_at_index(el,i);	  // let's look for a new minimum
-	}
-    }
 }
 
 /** try to remove element from min_hash */

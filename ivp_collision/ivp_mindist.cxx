@@ -342,7 +342,7 @@ public:
 class IVP_Vector_of_Collisions_128 : public IVP_U_Vector<class IVP_Collision> {
     void *elem_buffer[128];
 public:
-    IVP_Vector_of_Collisions_128(): IVP_U_Vector<class IVP_Collision>(&elem_buffer[0],128){;};
+    IVP_Vector_of_Collisions_128(): IVP_U_Vector<class IVP_Collision>(&elem_buffer[0],128){}
 };
 
 
@@ -652,14 +652,14 @@ public:
 class IVP_Vector_of_OV_Elements_128 : public IVP_U_Vector<class IVP_OV_Element> {
     void *elem_buffer[128];
 public:
-    IVP_Vector_of_OV_Elements_128(): IVP_U_Vector<class IVP_OV_Element>(&elem_buffer[0],128){;};
+    IVP_Vector_of_OV_Elements_128(): IVP_U_Vector<class IVP_OV_Element>(&elem_buffer[0],128){}
 };
 
 //vector of cores with 2 default elements already alloced
 class IVP_Vector_of_Objects_128: public IVP_U_Vector<class IVP_Real_Object> {
     IVP_Real_Object *elem_buffer[128];
 public:
-    IVP_Vector_of_Objects_128(): IVP_U_Vector<IVP_Real_Object>( (void **)&elem_buffer[0],128 ){;};
+    IVP_Vector_of_Objects_128(): IVP_U_Vector<IVP_Real_Object>( (void **)&elem_buffer[0],128 ){}
 };
 
 void IVP_Mindist_Manager::recheck_ov_element(IVP_Real_Object *object){
@@ -886,7 +886,7 @@ void IVP_Mindist::update_exact_mindist_events(IVP_BOOL allow_hull_conversion, IV
 		IVP_Debug_Manager *dm=get_environment()->get_debug_manager();
 		if(dm->file_out_impacts) 
 		{
-			fprintf(dm->out_deb_file,"doing_mindist_events %lx at %f\n",0x0000ffff&(long)this,get_environment()->get_current_time().get_time());
+			fprintf(dm->out_deb_file,"doing_mindist_events %zi at %f\n",0x0000ffff&(intp)this,get_environment()->get_current_time().get_time());
 		}
 	}
 	
@@ -1164,7 +1164,7 @@ void IVP_Mindist::mindist_hull_limit_exceeded_event( IVP_HTIME hull_intrusion_va
       IVP_DOUBLE estimated_distance = this->get_length() - angular_movement - delta_center_distance + hull_intrusion_value;
       // this estimated_distance can now be used to throw mindist into hull again
       IVP_DOUBLE const look_ahead_factor = 6.0f;
-	IVP_IF( 0 && this->contact_plane.k[1] == -1.0f && !this->mindist_function){
+	IVP_IF( 0 && hk_Math::almost_equal( this->contact_plane.k[1], -1.0f ) && !this->mindist_function){
 	    ivp_message("sum_angular %f   angular_movement %f    sum_angular_hull_time %f\n", 
 		sum_angular, angular_movement, sum_angular_hull_time);
 	}
@@ -1186,7 +1186,7 @@ void IVP_Mindist::mindist_hull_limit_exceeded_event( IVP_HTIME hull_intrusion_va
 	IVP_DOUBLE dist_factor = estimated_distance / speed;
 	IVP_DOUBLE dist0 = dist_factor * speed0;
 	IVP_DOUBLE dist1 = dist_factor * speed1;
-	IVP_IF( 0 &&  this->contact_plane.k[1] == -1.0f && !this->mindist_function){
+	IVP_IF( 0 && hk_Math::almost_equal( this->contact_plane.k[1], -1.0f ) && !this->mindist_function){
 	    ivp_message("est_dist %f, center_dist %f   sum_angular %f\n", 
 		len_numerator, delta_center_distance, sum_angular);
 	}

@@ -7,7 +7,7 @@
 
 #include <ivp_physics.hxx>
 
-#if defined(LINUX) || defined(SUN) || (__MWERKS__ && __POWERPC__)
+#if defined(LINUX) || defined(SUN) || (defined(__MWERKS__) && __POWERPC__)
 #	include <alloca.h>
 #endif
 #include <ivp_great_matrix.hxx>
@@ -16,7 +16,6 @@
 
 #define IVP_UNILATERAL_SOLVER_MAX_STEP 250
 #define IVP_STATIC_FRICTION_TEST_EPS 0.00001f //is a percentage value
-#define COMPLEX_EPS 10E-6f
 #define IVP_NUMERIC_TEST_EVERY_N 7
 
 
@@ -2084,7 +2083,7 @@ IVP_RETURN_TYPE IVP_Great_Matrix_Many_Zero::lu_inverse(IVP_Great_Matrix_Many_Zer
 
 IVP_RETURN_TYPE IVP_Great_Matrix_Many_Zero::lu_solve(int *index_vec) {
    int  i, nonzero=-1, iperm, j ;
-   IVP_DOUBLE sum, zero = 0.0f ;
+   IVP_DOUBLE sum;
 
    int n_columns = this->columns;
    
@@ -2106,7 +2105,7 @@ IVP_RETURN_TYPE IVP_Great_Matrix_Many_Zero::lu_solve(int *index_vec) {
 	  for ( j = nonzero-1; j <= i-1; j++ ) {
             sum -= matrix_values[i*n_columns+j] * desired_vector[j] ;
 	  }
-      else if ( sum != zero )
+      else if ( !hk_Math::almost_zero( sum ) )
          nonzero = i+1 ;
       desired_vector[i] = sum ;
    }

@@ -83,13 +83,50 @@ inline hk_real hk_Math::clamp( hk_real r, hk_real mn, hk_real mx)
 
 inline int hk_Math::int_log2( hk_real ) { return 0; }
 
+inline bool hk_Math::almost_equal( hk_real a, hk_real b, hk_real eps )
+{
+	// Calculate the difference.
+	const hk_real diff{hk_Math::fabs(a - b)};
+
+	a = hk_Math::fabs(a);
+	b = hk_Math::fabs(b);
+
+	// Find the largest.
+	const hk_real largest{(b > a) ? b : a};
+
+	return diff <= largest * eps;
+}
+
+inline bool hk_Math::almost_equal( hk_double a, hk_double b, hk_double eps )
+{
+	// Calculate the difference.
+	const hk_double diff{hk_Math::fabsd(a - b)};
+
+	a = hk_Math::fabsd(a);
+	b = hk_Math::fabsd(b);
+
+	// Find the largest.
+	const hk_double largest{(b > a) ? b : a};
+
+	return diff <= largest * eps;
+}
+
+inline bool hk_Math::almost_zero( hk_real a, hk_real eps )
+{
+	return hk_Math::fabs(a) <= eps;
+}
+
+inline bool hk_Math::almost_zero( hk_double a, hk_double eps )
+{
+	return hk_Math::fabsd(a) <= eps;
+}
 
 inline hk_real hk_Math::_rand01()
 {
 	// BSD rand function
-	const unsigned a = 1103515245;
-	const unsigned c = 12345;
-	const unsigned m = unsigned(-1) >> 1;
+	constexpr unsigned a = 1103515245;
+	constexpr unsigned c = 12345;
+	constexpr unsigned m = unsigned(-1) >> 1;
 	hk_random_seed = (a * hk_random_seed + c ) & m;
 	return hk_real(hk_random_seed) / m;
 }

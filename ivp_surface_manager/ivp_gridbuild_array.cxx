@@ -685,7 +685,6 @@ void IVP_GridBuilder_Array::convert_strip_to_compact_ledges(int row, IVP_U_Vecto
 #endif
 		break;
 	    }
-	    break;
 	}
 	int ledge_index = ledges->len();
 	ledges->add(cl);
@@ -740,7 +739,7 @@ void IVP_GridBuilder_Array::convert_array_to_compact_ledges( const IVP_Template_
 /* merge everything into the final compact grid thing */
 IVP_Compact_Grid *IVP_GridBuilder_Array::compile_ledges_into_compact_grid(const IVP_Template_Compact_Grid *gp,IVP_U_Vector<IVP_Compact_Ledge> *ledges){
 	IVP_Compact_Grid *cg = NULL;
-	int buffer_size = (char *)&cg->offset_compact_ledge_array[0] - (char *)cg;	// size for base compact ledge
+	intp buffer_size = (char *)&cg->offset_compact_ledge_array[0] - (char *)cg;	// size for base compact ledge
 
 	buffer_size += ledges->len() * sizeof(int); // add buffersize for ledge index array
 	buffer_size += (n_rows-1) * (n_cols-1) * sizeof(IVP_Compact_Grid_Element);	 //the grid referencing ledge index array
@@ -788,7 +787,7 @@ IVP_Compact_Grid *IVP_GridBuilder_Array::compile_ledges_into_compact_grid(const 
 		is_left_handed = IVP_FALSE;
 	    }
 	}
-	IVP_DOUBLE max_delta_height_os;
+	//IVP_DOUBLE max_delta_height_os;
 	{ // find center, use bounding box
 	    IVP_FLOAT max, min;
 	    max = min = height_field[0];
@@ -800,7 +799,7 @@ IVP_Compact_Grid *IVP_GridBuilder_Array::compile_ledges_into_compact_grid(const 
 	    center_gs.set( (n_rows-1) * 0.5f, (n_cols-1) * 0.5f, (max + min) * 0.5f );
 
 	    m_object_f_grid.vmult4( &center_gs, &cg->center );
-	    max_delta_height_os = (max - min ) * 0.5f;
+	    //max_delta_height_os = (max - min ) * 0.5f;
 	}
 
 	IVP_U_Point center; center.set(&cg->center);
@@ -837,7 +836,7 @@ IVP_Compact_Grid *IVP_GridBuilder_Array::compile_ledges_into_compact_grid(const 
 		}
 
 		// and the ledges
-		dest = (char *)((long(dest)+0xf) & ~0xf);     	// align destination
+		dest = (char *)((intp(dest)+0xf) & ~0xf);     	// align destination
 		for (int ledge_index = 0; ledge_index < ledges->len(); ledge_index++){
 			IVP_Compact_Ledge *cl;
 			cl = ledges->element_at(ledge_index);

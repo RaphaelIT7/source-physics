@@ -49,7 +49,7 @@ void IVP_Event_Manager_Standard::simulate_time_events(IVP_Time_Manager *tman,IVP
 void IVP_Event_Manager_D::simulate_time_events(IVP_Time_Manager *tman,IVP_Environment *env,IVP_Time time) {
   IVP_FLOAT event_time;
   event_time = tman->min_hash->find_min_value();
-  if( time - tman->base_time ){
+  if( !hk_Math::almost_zero( time - tman->base_time ) ){
     //while ( (event_time = tman->min_hash->find_min_value()) < time - tman->base_time ){
       IVP_Time_Event *event = (IVP_Time_Event *)tman->min_hash->find_min_elem();
       tman->min_hash->remove_minlist_elem(event->index);
@@ -164,21 +164,42 @@ int IVP_Time_Manager::get_event_count()
 void IVP_Event_Manager::simulate_time_events(IVP_Time_Manager *,IVP_Environment *, IVP_Time) {
 };
 
+// dimhotepus: RAII wrapper as original code leaked FPU mode.
+#if defined(WIN32) && defined(_M_IX86)
+// doesnt work with threads !!
+class ScopedFpuMode {
+ public:
+  explicit ScopedFpuMode(uint16_t new_mode) noexcept {
+    // MSVC complains when we write to member directly.
+    uint16_t old_mode;
+
+    __asm FSTCW old_mode;
+    new_mode = old_mode | new_mode;
+    __asm FLDCW new_mode;
+
+    old_mode_ = old_mode;
+  }
+  ~ScopedFpuMode() noexcept {
+    // MSVC complains when we write to member directly.
+    uint16_t old_mode = old_mode_;
+    __asm FLDCW old_mode;
+  }
+
+ private:
+  uint16_t old_mode_;
+};
+#endif
+
 void IVP_Time_Manager::event_loop(IVP_Environment *env, IVP_Time time) {
   /************************************************
   * FPU mode
   ************************************************/
-  //doesnt work with threads !!
-#if defined WIN32 && defined(_M_IX86)
-  WORD tmpflag;
-  __asm FSTCW tmpflag;
-
-  WORD newFPUflag = tmpflag | 0x0300;
-  __asm FLDCW newFPUflag;
+#if defined(WIN32) && defined(_M_IX86)
+  const ScopedFpuMode scoped_fpu_mode{0x0300};
 #endif
 
 #ifdef IVP_ENABLE_PERFORMANCE_COUNTER
-	env->get_performancecounter()->start_pcount();
+  env->get_performancecounter()->start_pcount();
 #endif
 
   event_manager->simulate_time_events(this,env,time);
@@ -186,24 +207,16 @@ void IVP_Time_Manager::event_loop(IVP_Environment *env, IVP_Time time) {
 #ifdef IVP_ENABLE_PERFORMANCE_COUNTER
 	env->get_performancecounter()->stop_pcount();
 #endif
-
-#if defined WIN32 && defined(_M_IX86)
-  __asm FLDCW tmpflag;
-#endif
 }
 
 void IVP_Time_Manager::simulate_variable_time_step(IVP_Environment *env, IVP_FLOAT delta_time) {
   /************************************************
   * FPU mode
   ************************************************/
-  //doesnt work with threads !!
-#if defined WIN32 && defined(_M_IX86)
-  WORD tmpflag;
-  __asm FSTCW tmpflag;
-
-  WORD newFPUflag = tmpflag | 0x0300;
-  __asm FLDCW newFPUflag;
+#if defined(WIN32) && defined(_M_IX86)
+  const ScopedFpuMode scoped_fpu_mode{0x0300};
 #endif
+
   if ( delta_time < IVP_MIN_DELTA_PSI_TIME ){
 	  delta_time = IVP_MIN_DELTA_PSI_TIME;
   }
@@ -217,12 +230,9 @@ void IVP_Time_Manager::simulate_variable_time_step(IVP_Environment *env, IVP_FLO
 #endif
 
   event_manager->simulate_variable_time_step(this,env,psi_event, delta_time);
-#ifdef IVP_ENABLE_PERFORMANCE_COUNTER
-	env->get_performancecounter()->stop_pcount();
-#endif
 
-#if defined WIN32 && defined(_M_IX86)
-  __asm FLDCW tmpflag;
+#ifdef IVP_ENABLE_PERFORMANCE_COUNTER
+  env->get_performancecounter()->stop_pcount();
 #endif
 }
 

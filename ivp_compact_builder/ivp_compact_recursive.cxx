@@ -68,9 +68,9 @@ void IVP_Compact_Recursive::set_rekursive_convex_hull(){
   struct Triangle_Key {
     int point_index[3];
     void set_tri(int a, int b, int c){
-      if (b<a){ int x = a;a=b;b=a;a=x; };
-      if (c<a){ int x = a;a=c;c=a;a=x; };
-      if (b<a){ int x = a;a=b;b=a;a=x; };
+      if (b<a){ int x = a;a=b;b=a;a=x; }
+      if (c<a){ int x = a;a=c;c=a;a=x; }
+      if (b<a){ int x = a;a=b;b=a;a=x; }
       // now a < b < c
       point_index[0] = a; point_index[1] = b; point_index[2] = c;
     }
@@ -79,7 +79,7 @@ void IVP_Compact_Recursive::set_rekursive_convex_hull(){
   struct Edge_Key {
     int point_index[2];
     void set_edge(int a, int b){
-      if (b<a){ int x = a;a=b;b=a;a=x; };
+      if (b<a){ int x = a;a=b;b=a;a=x; }
       // now a < b < c
       point_index[0] = a; point_index[1] = b;
     }
@@ -125,8 +125,9 @@ void IVP_Compact_Recursive::set_rekursive_convex_hull(){
       }
     }
   }
-  int edges_found = 0;
-  int edges_not_found = 0;
+  // dimhotepus: Comment unused.
+  // int edges_found = 0;
+  // int edges_not_found = 0;
   // set all flags
   {
     IVP_Compact_Ledge *ledge = hull;
@@ -154,9 +155,9 @@ void IVP_Compact_Recursive::set_rekursive_convex_hull(){
 	edge_key.set_edge( pi[j], pi[ (j+1)%3]);
 	if (!edge_hash.find( (char *)&edge_key)){
 	  ((IVP_Compact_Edge *)tri->get_edge(j))->set_is_virtual(1);
-	  edges_not_found ++;
+	  // edges_not_found ++;
 	}else{
-	  edges_found ++;
+	  // edges_found ++;
 	}
       }
     }

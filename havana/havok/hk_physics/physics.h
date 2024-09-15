@@ -28,7 +28,7 @@ public:
 
 };
 
-#define HK_TRANSFORM_TO_CORE_SPACE(body, vec) body->get_core()->get_m_world_f_core_PSI()->inline_vimult3((IVP_U_Float_Point *)&vec, (IVP_U_Float_Point *)&vec);
+#define HK_TRANSFORM_TO_CORE_SPACE(body, vec) body->get_core()->get_m_world_f_core_PSI()->inline_vimult3((IVP_U_Float_Point *)&vec, (IVP_U_Float_Point *)&vec)
 //#define HK_TRANSFORM_TO_CORE_SPACE(body, vec) vec.set_zero();
 
 class hk_Rigid_Body: public IVP_Real_Object
@@ -65,7 +65,7 @@ public:
 		if ( !this->flags.shift_core_f_object_is_zero)
 			next_m_world_f_core.vmult4(get_shift_core_f_object(), &next_m_world_f_core.vv);
 
-		next_m_world_f_core.get_4x4_column_major((hk_real*)&t);
+		next_m_world_f_core.get_4x4_column_major(&t);
 
 		return t;
 	}
@@ -74,14 +74,14 @@ public:
 		hk_Transform t;
 		if ( this->flags.shift_core_f_object_is_zero )
 		{
-			this->get_core()->get_m_world_f_core_PSI()->get_4x4_column_major( (hk_real *)&t );
+			this->get_core()->get_m_world_f_core_PSI()->get_4x4_column_major( &t );
 		}
 		else
 		{
 			IVP_U_Matrix coreShiftMatrix;
 			coreShiftMatrix.set_matrix( this->get_core()->get_m_world_f_core_PSI() );
 			coreShiftMatrix.vmult4( this->get_shift_core_f_object(), &coreShiftMatrix.vv );
-			coreShiftMatrix.get_4x4_column_major( (hk_real *)&t );
+			coreShiftMatrix.get_4x4_column_major( &t );
 		}
 		return t;
 	}
@@ -171,9 +171,7 @@ protected:
 
 protected:
 	hk_Rigid_Body_Binary_EF( hk_Environment *, hk_Rigid_Body *, hk_Rigid_Body *, hk_effector_priority );
-	~hk_Rigid_Body_Binary_EF(){
-
-	}
+	~hk_Rigid_Body_Binary_EF() = default;
 	
 public:
 	virtual void get_effected_entities(hk_Array<hk_Entity*> &ent_out)
@@ -200,12 +198,12 @@ protected:
 public:
     //Controller Section
     IVP_U_Vector<IVP_Core> actuator_controlled_cores;
-    IVP_U_Vector<IVP_Core> *get_associated_controlled_cores() { return &actuator_controlled_cores; };
-    IVP_CONTROLLER_PRIORITY get_controller_priority() { return IVP_CP_CONSTRAINTS_MIN; };
+    IVP_U_Vector<IVP_Core> *get_associated_controlled_cores() override { return &actuator_controlled_cores; }
+    IVP_CONTROLLER_PRIORITY get_controller_priority() override { return IVP_CP_CONSTRAINTS_MIN; }
 
 	virtual void apply_effector_PSI(	class hk_PSI_Info& pi, hk_Array<hk_Entity*>* ) = 0;
 
-	void do_simulation_controller(IVP_Event_Sim *es,IVP_U_Vector<IVP_Core> * /*core_list*/)
+	void do_simulation_controller(IVP_Event_Sim *es,IVP_U_Vector<IVP_Core> * /*core_list*/) override
 	{
 		apply_effector_PSI( *(hk_PSI_Info *)(es), NULL );
 	}
@@ -215,16 +213,15 @@ public:
 			m_environment = env;
 	}
 
-    virtual void anchor_will_be_deleted_event(IVP_Anchor *del_anchor){ // when an object is deleted it sends events to its connected actuators
+    virtual void anchor_will_be_deleted_event( [[maybe_unused]] IVP_Anchor *del_anchor){ // when an object is deleted it sends events to its connected actuators
 		delete this;
 	}
 
-    virtual void core_is_going_to_be_deleted_event(IVP_Core *my_core){
+    void core_is_going_to_be_deleted_event( [[maybe_unused]] IVP_Core *my_core) override {
 		delete this;
 	}
 
     virtual ~hk_Link_EF(){
-		;
 	}
 
 	inline hk_Environment *get_environment() const

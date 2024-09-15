@@ -46,8 +46,6 @@
  *		Achse 1	-> 2 0
  */
 
-#define IVP_SAFETY_FACTOR_HULL 1.1f
-
 #define IVP_MINIMAL_TRANS_SPEED_PER_PSI_SHORT 0.01f
 #define IVP_MINIMAL_ROT_SPEED_PER_PSI_SHORT 0.005f
 #define IVP_MINIMAL_TRANS_SPEED_PER_PSI_LONG 0.1f
@@ -772,7 +770,7 @@ void IVP_Core::synchronize_with_rot_z(){
     IVP_IF(1) {
         IVP_Debug_Manager *dm=environment->get_debug_manager();
 	if(dm->file_out_impacts) {
-	    fprintf(dm->out_deb_file,"doing_synchronize %lx at %f\n",0x0000ffff&(long)this,current_time.get_time());
+	    fprintf(dm->out_deb_file,"doing_synchronize %zi at %f\n",0x0000ffff&(intp)this,current_time.get_time());
 	}
     }
     
@@ -1312,7 +1310,7 @@ void IVP_Core::ensure_core_to_be_in_simulation() {
 	return;
     }
     
-    if((this->movement_state==IVP_MT_NOT_SIM))
+    if(this->movement_state==IVP_MT_NOT_SIM)
     {
 	IVP_Environment *env=this->environment;
 	//IVP_ASSERT( env->state==IVP_ES_AT );

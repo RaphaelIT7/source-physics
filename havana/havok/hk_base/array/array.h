@@ -5,6 +5,8 @@
 #	error Include <hk_base/base.h> instead.
 #endif
 
+#include <algorithm>  // std::swap
+
 class hk_Array_Base
 {
 	public:
@@ -64,7 +66,7 @@ class hk_Array :  protected hk_Array_Base
 
 	HK_PUBLIC:
 
-		T *get_elems(){ return (T*)m_elems; };
+		T *get_elems(){ return (T*)m_elems; }
 	protected:
 		inline hk_Array(T *elems, int initial_size);
 		// for preallocated array

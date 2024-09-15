@@ -24,7 +24,7 @@
 IVP_U_Vector<IVP_Core> IVP_Controller_Independent::empty_list;
 
 #ifdef WIN32
-extern long p_get_time();
+extern long long p_get_time();
 #endif
 
 //the list of cores is valid, calculate the rest
@@ -689,21 +689,8 @@ IVP_BOOL IVP_Simulation_Unit::sim_unit_calc_movement_state(IVP_Environment *env)
 }
 
 void IVP_Simulation_Unit::init_moving_core_for_psi(IVP_Core *core, const IVP_Time &c_time) {
-
-    //IVP_PREFETCH(this->objects.elems); // now using special vector
-
-    IVP_IF(1) {
-	IVP_Friction_Info_For_Core *info=core->moveable_core_has_friction_info();
-	IVP_Friction_System *fs=NULL;
-	if(info) {
-	  fs=info->l_friction_system;
-	}
-    }
-  
     IVP_ASSERT(core->physical_unmoveable==IVP_FALSE);
 
-//    IVP_ASSERT ( c_time.get_time() == 0 || IVP_Inline_Math::fabsd( core->time_of_last_psi - c_time + 1.0f / core->i_delta_time ) < 10E-4f);
- 
     IVP_DOUBLE d_time = c_time - core->time_of_last_psi;
     
     core->q_world_f_core_next_psi.set_matrix(&core->m_world_f_core_last_psi);
@@ -741,7 +728,7 @@ void IVP_Simulation_Unit::simulate_single_sim_unit_psi(IVP_Event_Sim *es, IVP_U_
 	IVP_Core *my_core = sim_unit_cores.element_at(d);
         this->init_moving_core_for_psi(my_core, current_time);
 	IVP_IF(1) {
-	  for(int k=my_core->objects.len()-1;k>=0;k--) {	    IVP_ASSERT(my_core->objects.element_at(k)->get_movement_state()<IVP_MT_NOT_SIM);	  }	    
+	  for(int k=my_core->objects.len()-1;k>=0;k--) {	    IVP_ASSERT(my_core->objects.element_at(k)->get_movement_state()<=IVP_MT_NOT_SIM);	  }	    
 	}
 	
 	my_core->commit_all_async_pushes(); // @@@OS this happens very seldomly !!!!, remove !!!!this necessary as it may happen that core was temporarily_unmovable
@@ -758,7 +745,7 @@ void IVP_Simulation_Unit::simulate_single_sim_unit_psi(IVP_Event_Sim *es, IVP_U_
         this->init_moving_core_for_psi(my_core, current_time);
 	IVP_IF(1) {
 	  for(int k=my_core->objects.len()-1;k>=0;k--) {
-	    IVP_ASSERT(my_core->objects.element_at(k)->get_movement_state()<IVP_MT_NOT_SIM);
+	    IVP_ASSERT(my_core->objects.element_at(k)->get_movement_state()<=IVP_MT_NOT_SIM);
 	  }	    
 	}
 	my_core->commit_all_async_pushes(); // @@@OS this happens very seldomly !!!!, remove !!!!this necessary as it may happen that core was temporarily_unmovable
@@ -784,7 +771,7 @@ void IVP_Simulation_Unit::simulate_single_sim_unit_psi(IVP_Event_Sim *es, IVP_U_
 
     //controllers are sorted
     for(int j=controller_num-1;j>=0;j--) {
-	IVP_CONTROLLER_PRIORITY debug_contr_prio;
+	[[maybe_unused]] IVP_CONTROLLER_PRIORITY debug_contr_prio;
         IVP_Controller *my_controller = controller_cores.element_at(j)->l_controller;
 	IVP_IF(1) {
 	    debug_contr_prio=my_controller->get_controller_priority();
@@ -897,7 +884,7 @@ sim_units_0:
 
 
 #if 0 && defined(WIN32)
-  unsigned long time = p_get_time();
+  unsigned long long time = p_get_time();
 
   //BLOCKING
   if( (time > 957460357 /*4may*/ + 60*60*24* (31+26) )) {

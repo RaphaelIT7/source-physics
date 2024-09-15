@@ -695,7 +695,7 @@ void qh_initflags(char *command) {
 	default:
 	  s--;
 	  ivp_message( "qhull warning: unknown 'F' output option %c, rest ignored\n", (int)s[0]);
-	  while (*++s && !isspace(*s)){;};
+	  while (*++s && !isspace(*s)){}
 	  break;
 	}
       }
@@ -759,7 +759,7 @@ void qh_initflags(char *command) {
 	default:
 	  s--;
 	  ivp_message( "qhull warning: unknown 'G' print option %c, rest ignored\n", (int)s[0]);
-	  while (*++s && !isspace(*s)){;};
+	  while (*++s && !isspace(*s)){}
 	  break;
 	}
       }
@@ -940,12 +940,10 @@ void qh_initflags(char *command) {
 	  qh_option ("Q1-no-angle-sort", NULL, NULL);
 	  qh ANGLEmerge= False;
 	  goto LABELcheckdigit;
-	  break; /* no warnings */
 	case '2':
 	  qh_option ("Q2-no-merge-independent", NULL, NULL);
 	  qh MERGEindependent= False;
 	  goto LABELcheckdigit;
-	  break; /* no warnings */
 	case '3':
 	  qh_option ("Q3-no-merge-vertices", NULL, NULL);
 	  qh MERGEvertices= False;
@@ -1084,7 +1082,7 @@ void qh_initflags(char *command) {
 	    s++;
 	    ivp_message( "qhull warning: option 'TO' mistyped.\nUse 'TO', one space, file name, and space or end-of-line.\nThe file name may be enclosed in single quotes.\nDo not use double quotes.  Option 'FO' ignored.\n");
 	  }else {  /* not a procedure because of qh_option (filename, NULL, NULL); */
-	    char filename[500], *t= filename;
+	    char filename[500], *tt= filename;
 	    boolT isquote= False;
 
 	    s++;
@@ -1093,7 +1091,7 @@ void qh_initflags(char *command) {
 	      s++;
 	    }
 	    while (*s) {
-	      if (t - filename >= (int)(sizeof (filename)-2)) {
+	      if (tt - filename >= (int)(sizeof (filename)-2)) {
 		ivp_message( "qhull error: filename for 'TO' too long.\n");
 		qh_errexit (qh_ERRinput, NULL, NULL);
 	      }
@@ -1105,9 +1103,9 @@ void qh_initflags(char *command) {
 		}
 	      }else if (isspace (*s))
 		break;
-	      *(t++)= *s++;
+	      *(tt++)= *s++;
 	    }
-	    *t= '\0';
+	    *tt= '\0';
 #if defined(PSXII) || defined(GEKKO)
 #else
 	    if (isquote) 
@@ -1292,14 +1290,15 @@ void qh_initqhull_globals (coordT *points, int numpoints, int dim, boolT ismallo
     qh_option ("Qbbound-last-qj", NULL, NULL);
   }
   if (qh MERGING && !qh POSTmerge && qh premerge_cos > REALmax/2 
-  && qh premerge_centrum == 0) {
+  && hk_Math::almost_zero( qh premerge_centrum ) ) {
     qh ZEROcentrum= True;
     qh ZEROall_ok= True;
     qh_option ("_zero-centrum", NULL, NULL);
   }
-  if (qh JOGGLEmax < REALmax/2 && REALepsilon > 2e-8 && qh PRINTprecision)
-    fprintf(qh ferr, "qhull warning: real epsilon, %2.2g, is probably too large for joggle ('QJn')\nRecompile with double precision reals (see user.h).\n",
-          REALepsilon);
+  if (qh JOGGLEmax < REALmax/2 && qh PRINTprecision)
+    if constexpr (REALepsilon > 2e-8)
+      fprintf(qh ferr, "qhull warning: real epsilon, %2.2g, is probably too large for joggle ('QJn')\nRecompile with double precision reals (see user.h).\n",
+              REALepsilon);
 #ifdef qh_NOmerge
   if (qh MERGING) {
     ivp_message( "qhull input error: merging not installed (qh_NOmerge + 'Qx', 'Cn' or 'An')\n");

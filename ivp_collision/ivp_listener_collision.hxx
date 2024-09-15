@@ -123,18 +123,18 @@ public:
 	// warning: not all data in IVP_Event_Friction is valid
 	//          (like surf_normal)
 
-	virtual void event_friction_pair_created( class IVP_Friction_Core_Pair *pair ) {}
+	virtual void event_friction_pair_created( class IVP_Friction_Core_Pair * ) {}
 
 	// the user app sould override this
-	virtual void event_friction_pair_deleted( class IVP_Friction_Core_Pair *pair ) {}
+	virtual void event_friction_pair_deleted( class IVP_Friction_Core_Pair * ) {}
 
 	// constructor
 	IVP_Listener_Collision(int /* IVP_LISTENER_COLLISION_CALLBACKS */ enable_callbacks = 1){
 		enabled_callbacks = enable_callbacks;	// set flags for implemented callbacks
-	};
+	}
 
 	// virtual destructor: @@CB
-	virtual ~IVP_Listener_Collision() {};
+	virtual ~IVP_Listener_Collision() {}
 };
 
 

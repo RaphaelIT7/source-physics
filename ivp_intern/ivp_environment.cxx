@@ -799,7 +799,7 @@ void ivp_dummy_func(){
     IVP_U_Set_Active<IVP_Core> ivp_class_dummy1(16);
     IVP_U_Set_Active<IVP_Real_Object> ivp_class_dummy2(16);
     IVP_U_Set_Active<IVP_Mindist_Base> ivp_class_dummy3(16);
-    IVP_Attacher_To_Cores<IVP_Controller_Buoyancy> *ivp_class_dummy8 = new IVP_Attacher_To_Cores<IVP_Controller_Buoyancy>(NULL);
+    [[maybe_unused]] IVP_Attacher_To_Cores<IVP_Controller_Buoyancy> *ivp_class_dummy8 = new IVP_Attacher_To_Cores<IVP_Controller_Buoyancy>(NULL);
 }
 
 void IVP_Time_Event_D::simulate_time_event(IVP_Environment *env) {
@@ -1016,7 +1016,7 @@ void IVP_Environment::simulate_psi(IVP_Time /*psi_time*/){
     return;
 }
 
-void IVP_Environment::set_global_collision_tolerance( IVP_DOUBLE tolerance, IVP_DOUBLE gravity_length ){
+void IVP_Environment::set_global_collision_tolerance( IVP_DOUBLE tolerance, [[maybe_unused]] IVP_DOUBLE gravity_length ){
     ivp_mindist_settings.set_collision_tolerance( tolerance );
     // CRACK - lol. according to both IDA and Ghidra, nothing is done with gravity_length
 }

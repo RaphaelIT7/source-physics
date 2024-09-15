@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2002, Valve LLC, All rights reserved. ============
+//========= Copyright 1996-2002, Valve LLC, All rights reserved. ============
 //
 // Purpose: 4-Wheel Vehicle attempt at a airboat!
 //
@@ -351,7 +351,6 @@ void IVP_Controller_Raycast_Airboat::DoSimulationSteering( IVP_Raycast_Airboat_P
 	for ( int iPoint = 0; iPoint < 4; ++iPoint )
 	{
 		IVP_Raycast_Airboat_Wheel *pPontoonPoint = get_wheel( IVP_POS_WHEEL( iPoint ) );
-		IVP_Raycast_Airboat_Pontoon_Temp *pTempPontoonPoint = &pTempPontoons[iPoint];
 
 		IVP_FLOAT flPontoonSign = iPoint >= 2 ? -1.0f : 1.0f;
 		IVP_FLOAT flForceRot = flForceRotational * flPontoonSign;
@@ -493,11 +492,11 @@ IVP_FLOAT IVP_Controller_Raycast_Airboat::get_booster_delay()
 	return booster_seconds_until_ready; 
 }
 
-
-void IVP_Controller_Raycast_Airboat::do_steering( IVP_FLOAT steering_angle_in )
+// dimhotepus: Override base class steering to apply it!
+void IVP_Controller_Raycast_Airboat::do_steering( IVP_FLOAT steering_angle_in, bool bAnalog )
 {
 	// Check for a change.
-    if (  m_SteeringAngle == steering_angle_in) 
+    if ( hk_Math::almost_equal( m_SteeringAngle, steering_angle_in ) ) 
 		return;
 
 	// Set the new steering angle.

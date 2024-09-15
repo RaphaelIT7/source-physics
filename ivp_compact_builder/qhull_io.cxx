@@ -147,7 +147,7 @@ static int qh_compare_facetarea(const void *p1, const void *p2) {
     return 1; 
   if (a->f.area > b->f.area)
     return 1;
-  else if (a->f.area == b->f.area)
+  else if (hk_Math::almost_equal(a->f.area, b->f.area))
     return 0;
   return -1;
 } /* compare_facetarea */
@@ -406,7 +406,7 @@ pointT *qh_detvnorm (vertexT *vertex, vertexT *vertexA, setT *centers, realT *of
         wwmax_(Wridge0max, angle);
         wwadd_(Wridge0, angle);
       }else {
-        zzinc_(Zridgeok)
+        zzinc_(Zridgeok);
         wwmax_(Wridgeokmax, angle);
         wwadd_(Wridgeok, angle);
       }
@@ -1122,14 +1122,12 @@ void qh_printafacet(FILE *fp, int format, facetT *facet, boolT printall) {
     qh_outerinner (facet, NULL, &innerplane);
     offset= facet->offset - innerplane;
     goto LABELprintnorm;
-    break; /* prevent warning */
   case qh_PRINTmerges:
     fprintf (fp, "%d\n", facet->nummerge);
     break;
   case qh_PRINTnormals:
     offset= facet->offset;
     goto LABELprintnorm;
-    break; /* prevent warning */
   case qh_PRINTouter:
     qh_outerinner (facet, &outerplane, NULL);
     offset= facet->offset - outerplane;

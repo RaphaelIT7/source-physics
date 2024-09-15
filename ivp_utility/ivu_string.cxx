@@ -2,11 +2,11 @@
 
 #include <ivp_physics.hxx>
 
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstdarg>
+#include <cstring>
 
-#include <ctype.h>
+#include <cctype>
 
 #if !defined(__MWERKS__) || !defined(__POWERPC__)
 #ifdef OSX
@@ -16,27 +16,15 @@
 #endif
 #endif
 #ifdef WIN32
-#	ifndef _XBOX
-#		ifndef WIN32_LEAN_AND_MEAN
-#			define WIN32_LEAN_AND_MEAN
-#		endif
-#		include <windows.h>
-#	else
-#		ifndef WINVER
-#			define WINVER 0x0500
-#		endif
-#		ifndef _X86_
-#			define _X86_
-#		endif  /* _X86_ */
-#		include <excpt.h>
-#		include <stdarg.h>
-#		include <windef.h>
-#		include <winbase.h>
+#	ifndef WIN32_LEAN_AND_MEAN
+#		define NOMINMAX
+#		define WIN32_LEAN_AND_MEAN
 #	endif
+#	include <Windows.h>
 #endif
 
 void P_String::uppercase(char *str)
-	{
+{
 	char c;
 	while( (c=*str) )	{
 		if ( (c<='z') && (c>='a')) *str = c - 'a' + 'A';
@@ -45,8 +33,6 @@ void P_String::uppercase(char *str)
 }
 
 #define P_MIN(a,b)(((a)<(b))?(a):(b))
-
-#define UPPERCASE(c) if ( (c>='a') && (c<='z')) c+= 'A'-'a'
 
 const char *P_String::find_string(const char *str, const char *key, int upper_case)
 {
@@ -157,7 +143,7 @@ int P_String::string_cmp(const char *str,const char *search,IVP_BOOL upper_case)
 				if (i > 250) break;
 			}
 			if (*p2 != '*' ) {
-				p1 += strlen((char *)p1)-i;	/* check the end of the string */
+				p1 += strlen(p1)-i;	/* check the end of the string */
 				if (p1 < str) return -1;	/* neither less or greater */
 				p2 -= i;
 			}else{
@@ -186,7 +172,7 @@ int P_String::string_cmp(const char *str,const char *search,IVP_BOOL upper_case)
 
 char *gbs_add_path(char *path,char *name)
 	{
-	int i,len,found;
+	intp i,len,found;
 	char *erg;
 	if (!name) return name;
 	if (!path) {
@@ -215,11 +201,10 @@ char *gbs_add_path(char *path,char *name)
 
 
 
-char *GBS_remove_escape(char *com)	/* \ is the escape charakter
-					*/
-	{
+char *GBS_remove_escape(char *com)	/* \ is the escape charakter */
+{
 	char *result,*s,*d;
-	int	ch;
+	char	ch;
 
 	s = d = result = p_strdup(com);
 	while ( (ch = *(s++)) ){
@@ -245,7 +230,7 @@ char *p_strdup(const char *s)
 {
     // kann auch NULLen
     if(s){
-	int len = strlen((char *)s)+1;
+	size_t len = strlen(s)+1;
 	char *s2 = (char *)p_malloc(len);
 	memcpy(s2,(char *)s,len); 
 	return s2;
@@ -388,10 +373,10 @@ IVP_DOUBLE p_get_float(){
 }
 
 
-int p_strlen(const char *s)
+ptrdiff_t p_strlen(const char *s)
 {
     if(!s || s[0] == 0) return 0;
-    return strlen((char *)s);
+    return strlen(s);
 }
 
 int p_strcmp( const char *s1, const char *s2){
@@ -431,12 +416,12 @@ int p_atoi(const char *s){
 
 
 #ifdef WIN32
-#	include <time.h>
+#	include <ctime>
 
-long p_get_time(){ // returns seconds since 1970
+// dimhotepus: long long instead of long for 64 bits.
+long long p_get_time(){ // returns seconds since 1970
 	time_t t;
-	time_t now = time(&t);
-	return t;
+	return time(&t);
 }
 
 
@@ -447,24 +432,5 @@ int	strcasecmp(const char *a,const char *b)
 {
 // chris, Sept 2000
 	return stricmp(a,b);
-
-/*
-	if(a==NULL) return -1;
-	if(b==NULL) return +1;
-	int i;
-
-	for(i=0;a[i];i++)
-	{
-		if(b[i]==0) return +1;
-		int ia=(int)a[i];
-		int ib=(int)b[i];
-		if((ia>=97) && (ia<123)) ia=ia-32;
-		if((ib>=97) && (ib<123)) ib=ib-32;
-		if(ia<ib) return -1;
-		if(ia>ib) return +1;
-	}
-	if(b[i]!=0) return -1; 
-	return 0;
-*/
 }
 #endif

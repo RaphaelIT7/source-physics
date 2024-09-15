@@ -27,7 +27,7 @@ extern char *	p_make_string(const char *templat, ...);
 extern char *	p_make_string_fast(const char *templat, ...); // doesn't check overflow
 
 int p_strcmp(const char *s1, const char *s2);
-int p_strlen(const char *s);
+ptrdiff_t p_strlen(const char *s);
 char *p_read_first_token(FILE *fp);
 char *p_get_next_token();
 int   p_get_num();
@@ -41,7 +41,8 @@ IVP_DOUBLE p_atof(const char *s);
 #ifdef WIN32
 int strcasecmp(const char *a, const char *b);
 void replace_slash(const char *in,char *out);
-long p_get_time(); // returns seconds since 1970
+// dimhotepus: long long instead of long for 64 bits.
+long long p_get_time(); // returns seconds since 1970
 #endif
 
 

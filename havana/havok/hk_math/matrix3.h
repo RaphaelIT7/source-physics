@@ -14,8 +14,6 @@ class hk_Matrix3
 
 		inline hk_Matrix3() = default;
 			//: Empty default constructor
-		inline ~hk_Matrix3() {}
-			//:: Empty default destructor
 
 		inline void set_elem(int row, int column, hk_real value);
 			//: Set element (row,column) to value
@@ -106,7 +104,7 @@ class hk_Matrix3
 
 	protected:
 
-		hk_real		HK_ALIGNED_VARIABLE(m_elems[12],16);
+		HK_ALIGNED_VARIABLE(hk_real m_elems[12], 16);
 
 };
 

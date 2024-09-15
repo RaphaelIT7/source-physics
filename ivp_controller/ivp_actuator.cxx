@@ -550,7 +550,7 @@ IVP_Actuator_Rot_Mot::~IVP_Actuator_Rot_Mot()
 }
 
 void IVP_Actuator_Rot_Mot::do_simulation_controller(IVP_Event_Sim *es,IVP_U_Vector<IVP_Core> * /*core_list*/) {
-    if (power == 0) return;	// don't wake up object
+    if ( hk_Math::almost_zero( power ) ) return;	// don't wake up object
   
     IVP_Real_Object *obj = get_actuator_anchor(0)->l_anchor_object;
     IVP_Core *core = obj->get_core();
@@ -641,7 +641,7 @@ IVP_Actuator_Torque::IVP_Actuator_Torque(IVP_Environment *env,    IVP_Template_T
     axis_in_core_coord_system.subtract(&get_actuator_anchor(1)->core_pos,&get_actuator_anchor(0)->core_pos);
     axis_in_core_coord_system.normize();
     this->torque = templ->torque;	
-    if (this->torque) {
+    if ( !hk_Math::almost_zero( this->torque ) ) {
 	ensure_actuator_in_simulation();
     }
 }
@@ -822,9 +822,10 @@ void IVP_Actuator_Extra::do_puck_force(IVP_DOUBLE dtime)
 	IVP_Core *pc0 = anch0->l_anchor_object->friction_core;
 	IVP_Core *pc1 = anch1->l_anchor_object->friction_core;
 
-	IVP_Real_Object *r_obj0,*r_obj1;
+    // dimhotepus: Comment unused stuff.
+	/*IVP_Real_Object *r_obj0,*r_obj1;
 	r_obj0=anch0->anchor_get_real_object();
-	r_obj1=anch1->anchor_get_real_object();
+	r_obj1=anch1->anchor_get_real_object();*/
 		
         IVP_U_Float_Point dir_ws;
 	IVP_U_Point pos0_ws;
@@ -904,9 +905,10 @@ void IVP_Actuator_Extra::do_float_cam(IVP_DOUBLE d_time)
     IVP_Core *pc0 = anch0->l_anchor_object->physical_core;
     IVP_Core *pc1 = anch1->l_anchor_object->physical_core;
 
-    IVP_Real_Object *r_obj0,*r_obj1;
+    // dimhotepus: Comment no side effects stuff.
+    /*IVP_Real_Object *r_obj0,*r_obj1;
     r_obj0=anch0->anchor_get_real_object();
-    r_obj1=anch1->anchor_get_real_object();
+    r_obj1=anch1->anchor_get_real_object();*/
 
     IVP_U_Point dir_ws;
     IVP_U_Point pos0_ws;

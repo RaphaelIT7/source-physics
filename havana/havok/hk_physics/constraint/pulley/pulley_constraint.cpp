@@ -15,15 +15,15 @@ class hk_Pulley_Work
 {
 	public:
 #ifdef HK_ARCH_PPC
-		static inline void *operator new (size_t size, void *addr){
+		static inline void *operator new (size_t, void *addr){
 			return addr;
 		}
 #else
-		static inline void *operator new (size_t size, void *addr){
+		static inline void *operator new (size_t, void *addr){
 			return addr;
 		}
 
-		static inline void operator delete (void *, void *){;}
+		static inline void operator delete (void *, void *){}
 #endif
 
 		hk_VM_Query_Builder< hk_VMQ_Storage<1> > query_engine;

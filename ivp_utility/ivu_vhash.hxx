@@ -40,8 +40,9 @@ protected:
     IVP_VHash(IVP_VHash_Elem *static_elems, int size);// assert(size = 2**x)
     virtual IVP_BOOL compare(void *elem0, void *elem1)const = 0;  // return TRUE if equal
 public:
-    static inline int hash_index(const char *data, int size);            // useable index calculation, result is [0,0xfffffff]
+    static inline int hash_index(const char *data, intp size);            // useable index calculation, result is [0,0xfffffff]
     static inline int fast_hash_index(int key);       // useable index calculation when size == 4 , result is [0,0xfffffff]
+    static inline int fast_hash_index(long long key);       // useable index calculation when size == 4 , result is [0,0xfffffff]
 
     // touches element
     void add_elem(const void *elem, int hash_index);
@@ -61,9 +62,9 @@ public:
     void deactivate(); // remove elems memory (assert no elems used)
     void activate(int preferred_size);   // allocate memory
  
-    int len() const { return size_mm+1;};  // size of hash array
-    int n_elems(){ return nelems; };  // elems in hash
-    void *element_at(int i) const { return (void *)elems[i].elem;};
+    int len() const { return size_mm+1;}  // size of hash array
+    int n_elems(){ return nelems; }  // elems in hash
+    void *element_at(int i) const { return (void *)elems[i].elem;}
     IVP_BOOL is_element_touched(int i) const { return (IVP_BOOL)(elems[i].hash_index >= IVP_VHASH_TOUCH_BIT); }
     void untouch_all();
     void print()const;
@@ -76,10 +77,10 @@ public:
 
 
 // basic function for calculating the hash_index
-inline int IVP_VHash::hash_index(const char *key, int key_size){
+inline int IVP_VHash::hash_index(const char *key, intp key_size){
 	unsigned int c;		
 	unsigned int index = 0xffffffffL;
-	int i;
+	intp i;
 	for (i=key_size-1;i>=0;i--){
 	    c = *((unsigned char *)(key++));
 	    index = IVP_Hash_crctab[((int) index ^ c) & 0xff] ^ (index >> 8);
@@ -93,7 +94,11 @@ inline int IVP_VHash::fast_hash_index(int key){
   return index | IVP_VHASH_TOUCH_BIT;	// set touch bit
 }
 
-
+// basic function for calculating the hash_index of key is a long long
+inline int IVP_VHash::fast_hash_index(long long key) {
+  int index = static_cast<int>(((key * 1001) >> 32) + key * 75);
+  return index | IVP_VHASH_TOUCH_BIT;  // set touch bit
+}
 
 
 
@@ -146,9 +151,9 @@ public:
     
     void *touch_element(void *key_elem,unsigned int hash_index);	// finds and touches
  
-    int len(){ return size;};
-    int n_elems(){ return nelems; };
-    void *element_at(int i){ return elems_store[i].elem;};
+    int len(){ return size;}
+    int n_elems(){ return nelems; }
+    void *element_at(int i){ return elems_store[i].elem;}
     IVP_BOOL is_element_touched(int i){ return (IVP_BOOL)(elems_store[i].hash_index >= IVP_VHASH_TOUCH_BIT); }
     void untouch_all();
     void print();

@@ -3,7 +3,7 @@
 
 #include <ivp_physics.hxx>
 
-#if defined(LINUX) || defined(SUN) || (__MWERKS__ && __POWERPC__)
+#if defined(LINUX) || defined(SUN) || (defined(__MWERKS__) && __POWERPC__)
 #	include <alloca.h>
 #endif
 
@@ -310,7 +310,8 @@ bool IVP_Contact_Point::friction_force_local_constraint_2d_wheel( IVP_Core *core
 	const IVP_DOUBLE tpm10 = tpm.get_elem( 1, 0 );
 	const IVP_DOUBLE tpm11 = tpm.get_elem( 1, 1 );
 	
-	IVP_RETURN_TYPE ret = IVP_Inline_Math::invert_2x2_matrix( tpm00, tpm01, tpm01, tpm11, &inv_mat2x2[0], &inv_mat2x2[1],&inv_mat2x2[2],&inv_mat2x2[3] );
+	// dimhotepus: tpm01 -> tpm10
+	IVP_RETURN_TYPE ret = IVP_Inline_Math::invert_2x2_matrix( tpm00, tpm01, tpm10, tpm11, &inv_mat2x2[0], &inv_mat2x2[1],&inv_mat2x2[2],&inv_mat2x2[3] );
 	if ( ret != IVP_OK ) 
 	{
 		flEnergy = 0.0f;
@@ -464,7 +465,8 @@ IVP_FLOAT IVP_Contact_Point::friction_force_local_constraint_2d(const IVP_Event_
 	const IVP_DOUBLE tpm10 = tpm.get_elem( 1, 0 );
 	const IVP_DOUBLE tpm11 = tpm.get_elem( 1, 1 );
 	
-	IVP_RETURN_TYPE ret = IVP_Inline_Math::invert_2x2_matrix( tpm00, tpm01, tpm01, tpm11, &inv_mat2x2[0], &inv_mat2x2[1],&inv_mat2x2[2],&inv_mat2x2[3] );
+	// dimhotepus: tpm01 -> tpm10
+	IVP_RETURN_TYPE ret = IVP_Inline_Math::invert_2x2_matrix( tpm00, tpm01, tpm10, tpm11, &inv_mat2x2[0], &inv_mat2x2[1],&inv_mat2x2[2],&inv_mat2x2[3] );
 	if( ret != IVP_OK ) 
 		return 0.0f;
 	
@@ -755,13 +757,10 @@ void IVP_Friction_Solver::ease_two_mindists(IVP_Contact_Point *dist0,IVP_Contact
 {    
     IVP_Core *rev_core=dist0->get_synapse(0)->l_obj->physical_core; //forces seen relative to this core
 
-    int second_core_reversed;
     IVP_FLOAT reverse_factor;
     if(rev_core!=dist1->get_synapse(0)->l_obj->physical_core) {
-	second_core_reversed=1;
 	reverse_factor = -1.0f;
     } else {
-	second_core_reversed=0;
 	reverse_factor = 1.0f;
     }
     
@@ -1069,9 +1068,9 @@ IVP_FLOAT IVP_Contact_Point_API::get_vert_force(IVP_Contact_Point *friction_hand
 
 
 void IVP_Contact_Point_API::get_surface_normal_ws(IVP_Contact_Point* friction_handle, IVP_U_Float_Point* normal){
-    *normal = friction_handle->tmp_contact_info
-                  ? friction_handle->tmp_contact_info->surf_normal
-                  : IVP_U_Float_Point(0, 0, 0);
+    // dimhotepus: Use cached surface normal as tmp_contact_info
+	// be nulled in debug_clean_tmp_info. 
+	*normal = friction_handle->last_surf_normal_ws;
 }
 
 void IVP_Friction_Info_For_Core::friction_info_insert_friction_dist(IVP_Contact_Point *dist)
@@ -1144,17 +1143,18 @@ void IVP_Friction_System::delete_friction_distance(IVP_Contact_Point *old_dist) 
 	core1->sim_unit_of_core->union_find_needed_for_sim_unit=IVP_TRUE;
     }
     
-    for(int i=0;i<2;i++) {
-	IVP_Synapse_Friction *my_syn=old_dist->get_synapse(i);
-	if(my_syn->prev) {
-	    my_syn->prev->next=my_syn->next;
-	} else {
-	    my_syn->l_obj->friction_synapses = my_syn->get_next();
-	}
-	if(my_syn->next) {
-	    my_syn->next->prev=my_syn->prev;
-	}
-    }
+	// dimhotepus: Done in old_dist destructor via remove_friction_synapse_from_object
+    // for(int i=0;i<0;i++) {
+	// IVP_Synapse_Friction *my_syn=old_dist->get_synapse(i);
+	// if(my_syn->prev) {
+	//     my_syn->prev->next=my_syn->next;
+	// } else {
+	//     my_syn->l_obj->friction_synapses = my_syn->get_next();
+	// }
+	// if(my_syn->next) {
+	//     my_syn->next->prev=my_syn->prev;
+	// }
+    // }
 
     //printf("deleting_frdist %lx o %lx c %lx  o %lx c %lx\n",(long)old_dist,(long)old_dist->synapse[0]->l_obj,(long)old_dist->synapse[0]->l_obj->to_real()->physical_core,(long)old_dist->synapse[1]->l_obj,(long)old_dist->synapse[1]->l_obj->to_real()->physical_core);
     P_DELETE(old_dist);
@@ -2067,8 +2067,7 @@ next_in_loop:;
 }
 
 
-void IVP_Friction_System::get_controlled_cores(IVP_U_Vector<IVP_Core> *vectr) {
-    vectr=NULL;
+void IVP_Friction_System::get_controlled_cores(IVP_U_Vector<IVP_Core> *) {
 }
 
 IVP_DOUBLE IVP_Friction_System::get_minimum_simulation_frequency() {

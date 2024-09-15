@@ -34,7 +34,7 @@ public:
   
     IVP_Compact_Ledge *compact_ledge;
     IVV_Sphere	*child_1, *child_2;
-    IVV_Sphere(){ P_MEM_CLEAR(this); };
+    IVV_Sphere(){ P_MEM_CLEAR(this); }
 };
 
 struct IVV_Sphere_Cluster {
@@ -329,7 +329,7 @@ void IVP_SurfaceBuilder_Ledge_Soup::ledges_to_spheres()
 	this->spheres_cluster[n].next     = n+1;
 	this->spheres_cluster[n].sphere   = sphere;
 
-	if ( this->smallest_radius == 0 ) {
+	if ( hk_Math::almost_zero(this->smallest_radius) ) {
 	    this->smallest_radius = sphere->radius;
 	}
 	else if ( sphere->radius < this->smallest_radius ) {
@@ -435,7 +435,7 @@ void IVP_SurfaceBuilder_Ledge_Soup::ledges_to_boxes_and_spheres()
 		this->spheres_cluster[n].next     = n+1;
 		this->spheres_cluster[n].sphere   = sphere;
 
-		if ( this->smallest_radius == 0 ) {
+		if ( hk_Math::almost_zero( this->smallest_radius ) ) {
 		    this->smallest_radius = sphere->radius;
 		} else if ( sphere->radius < this->smallest_radius ) {
 		    this->smallest_radius = sphere->radius;
@@ -1306,7 +1306,7 @@ void IVP_SurfaceBuilder_Ledge_Soup::insert_compact_ledges(){
        	    IVV_Sphere *sphere = this->terminal_spheres.element_at(i);
 	    IVP_Compact_Ledge *source = sphere->compact_ledge;
 
-	    IVP_ASSERT((long(dest) & 0xf) == 0);
+	    IVP_ASSERT((intp(dest) & 0xf) == 0);
 
 	    sphere->compact_ledge = (IVP_Compact_Ledge *)dest;	    
 	    int ledge_size = recompile_point_indizes_of_compact_ledge(source,dest);
@@ -1321,7 +1321,7 @@ void IVP_SurfaceBuilder_Ledge_Soup::insert_compact_ledges(){
        	IVV_Sphere *sphere = this->rec_spheres.element_at(j);
 	IVP_Compact_Ledge *source = sphere->compact_ledge;
 
-	IVP_ASSERT((long(dest) & 0xf) == 0);
+	IVP_ASSERT((intp(dest) & 0xf) == 0);
 
 	sphere->compact_ledge = (IVP_Compact_Ledge *)dest;
 	
@@ -1497,7 +1497,7 @@ IVP_RETURN_TYPE IVP_SurfaceBuilder_Ledge_Soup::create_compact_ledgetree() {
     return(IVP_OK);
 }
 
-#if defined(LINUX) || defined(SUN) || (__MWERKS__ && POWERPC)
+#if defined(LINUX) || defined(SUN) || (defined(__MWERKS__) && defined(POWERPC))
 void IVP_SurfaceBuilder_Ledge_Soup::convert_ledges_to_templates(IVP_U_BigVector<IVP_Compact_Ledge> &ledges,
 								IVP_U_Vector<IVP_Template_Polygon> *templates_out)
 {

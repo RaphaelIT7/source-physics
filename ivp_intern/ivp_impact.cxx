@@ -33,7 +33,8 @@
 #define IVP_SPEED_ADDON_SYSTEM_IMPACT 0.01f
 #define IVP_INV_HALF_CONSERVATION_STEPS 0.5f // elasticity is raised with number of impacts in system, at 1.0f/IVP_INV_HALF_CONSERVATION_STEPS the elasticity is at least 0.5
 #define MAXIMUM_SYSTEM_PUSH_NUMBER 5000
-#define MINIMAL_IMPACT_VELOCITY_FIXPOINT -11.552f
+// dimhotepus: Unused, comment.
+// #define MINIMAL_IMPACT_VELOCITY_FIXPOINT -11.552f
 #define IMPACT_EPS 10E-5f
 
 //#define EASEONIMPACT //doesnt work with balls // #+# kill and remove dependent functions
@@ -492,7 +493,7 @@ void IVP_Impact_Solver::do_rescue_push(IVP_U_Float_Point *push_dir_norm,IVP_BOOL
 	rel_speed_world.subtract(&world_speed1,&world_speed0);
 
 	IVP_DOUBLE dist_velocity=rel_speed_world.dot_product(&diff_vec_world); //velocity of distance change. negative means getting closer.
-	if((panic_mode==IVP_TRUE)) {
+	if(panic_mode==IVP_TRUE) {
 	    if(dist_velocity>0.0f) {
 		dist_velocity=0.0f; //assure that a positive push is really done
 	    }
@@ -641,7 +642,7 @@ void IVP_Impact_Solver::do_impact(IVP_Core *pushed_cores[2],IVP_BOOL allow_delay
 
     //printf("\n\n\nimpacting\n\n\n");
     IVP_DOUBLE virtual_speed,give_back_speed = 0.0f,speed_before;
-    IVP_DOUBLE relative_trans_speed_before;
+    //IVP_DOUBLE relative_trans_speed_before;
     IVP_DOUBLE used_conservation;
 
     IVP_IF(1) {
@@ -693,7 +694,7 @@ void IVP_Impact_Solver::do_impact(IVP_Core *pushed_cores[2],IVP_BOOL allow_delay
     IVP_IF(1) {
 	IVP_U_Float_Point trans_vec;
 	trans_vec.subtract( &trans_speed[0],&trans_speed[1] );
-	relative_trans_speed_before=trans_vec.real_length();
+	//relative_trans_speed_before=trans_vec.real_length();
     }
     
     //IVP_DOUBLE full_energy = this->get_total_energy();
@@ -1175,8 +1176,8 @@ void IVP_Contact_Point::recompute_friction() {
 	env->sim_unit_mem->end_memory_transaction();
 }
 
-void IVP_Impact_Solver::get_cos_sin_for_impact(IVP_FLOAT friction_val,IVP_FLOAT percent_energy_conservation,IVP_FLOAT *cos_val,IVP_FLOAT *sin_val) {
-    IVP_DOUBLE impact_fri_fact=friction_val * (1.0f + IVP_Inline_Math::ivp_sqrtf(percent_energy_conservation));
+void IVP_Impact_Solver::get_cos_sin_for_impact(IVP_FLOAT friction_val,IVP_FLOAT percent_energy_conservation_,IVP_FLOAT *cos_val,IVP_FLOAT *sin_val) {
+    IVP_DOUBLE impact_fri_fact=friction_val * (1.0f + IVP_Inline_Math::ivp_sqrtf(percent_energy_conservation_));
     IVP_DOUBLE fri_angle = IVP_Inline_Math::atand(impact_fri_fact);  // #+# bitter, kill, 
     IVP_DOUBLE c = IVP_Inline_Math::approx5_cos(fri_angle);
     *cos_val = c;
@@ -1643,7 +1644,7 @@ IVP_BOOL IVP_Impact_System::test_loop_all_pairs()
 	IVP_Core *impacting_cores[2];
 	worst_impact_dist->tmp_contact_info->impacts_while_system++;
        
-	worst_impact_dist->tmp_contact_info->do_impact_long_term(impacting_cores,worst_impact_dist->tmp_contact_info->impact.rescue_speed_addon,worst_impact_dist);
+	worst_impact_dist->tmp_contact_info->do_impact_long_term(impacting_cores,rescue_speed_addon,worst_impact_dist);
 	    
 	//printf("did_sys_imp %lx\n",(long)(&worst_impact_dist->long_term_impact_info)&0x0000ffff);
 	    
@@ -1695,10 +1696,10 @@ void  IVP_Impact_Solver::get_world_direction_second_friction(IVP_Contact_Point *
 		IVP_Core *i_core=cp->get_synapse(i)->l_obj->friction_core;
 		IVP_U_Matrix *mat=&i_core->m_world_f_core_last_psi;
 		mat->get_col(IVP_INDEX_X,&x_direction);
-		IVP_U_Float_Point *surf_normal=&cp->tmp_contact_info->surf_normal;
+		IVP_U_Float_Point *tmp_surf_normal=&cp->tmp_contact_info->surf_normal;
 
 		IVP_U_Float_Point x_in_surface;
-		x_in_surface.set_orthogonal_part(&x_direction,surf_normal);
+		x_in_surface.set_orthogonal_part(&x_direction,tmp_surf_normal);
 	    
 		IVP_DOUBLE relevance_factor=x_in_surface.real_length();
 		IVP_DOUBLE second_friction_val=mtl[i]->get_second_friction_factor();
@@ -1842,7 +1843,7 @@ void IVP_Contact_Point::calc_coll_distance(){
 class IVP_Vector_of_Hull_Managers_256: public IVP_U_Vector<IVP_Hull_Manager_Base> {
     void *elem_buffer[256];
 public:
-    IVP_Vector_of_Hull_Managers_256(): IVP_U_Vector<IVP_Hull_Manager_Base>( &elem_buffer[0],256 ){;};
+    IVP_Vector_of_Hull_Managers_256(): IVP_U_Vector<IVP_Hull_Manager_Base>( &elem_buffer[0],256 ){}
 };
 
 void IVP_Impact_System::recalc_all_affected_cores()
