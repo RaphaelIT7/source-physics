@@ -759,6 +759,9 @@ void IVP_Core::init_core_for_simulation(){
 void IVP_Core::synchronize_with_rot_z(){
     IVP_ASSERT(tmp_null.old_sync_info == NULL); 
 
+    if (!tmp_null.old_sync_info)
+        return;
+
     IVP_U_Memory *mem=environment->sim_unit_mem;
     void *p=mem->get_mem_transaction(sizeof(IVP_Old_Sync_Rot_Z));
     
@@ -804,6 +807,8 @@ void IVP_Core::undo_synchronize_rot_z() {
 	    fprintf(dm->out_deb_file,"undoing_synchro %x at %f\n",0x0000ffff&(IVP_INT32)(intp)this,environment->get_current_time().get_time());
 	}
     }
+    if (!tmp_null.old_sync_info)
+        return;
     rot_speed.      set(&tmp_null.old_sync_info->old_sync_rot_speed);
     q_world_f_core_next_psi = tmp_null.old_sync_info->old_sync_q_world_f_core_next_psi;
     tmp_null.old_sync_info=NULL;

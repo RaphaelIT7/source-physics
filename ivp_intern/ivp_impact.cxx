@@ -1858,7 +1858,8 @@ void IVP_Impact_System::recalc_all_affected_cores()
 		}
 	    }
 	    IVP_ASSERT(found==IVP_TRUE);
-	    IVP_ASSERT(my_core->tmp_null.old_sync_info->was_pushed_during_i_s==IVP_TRUE);
+		if (my_core->tmp_null.old_sync_info)
+			IVP_ASSERT(my_core->tmp_null.old_sync_info->was_pushed_during_i_s==IVP_TRUE);
 	}
     }
     {
